@@ -1,0 +1,21 @@
+{
+  "name": "com.unity.combat",
+  "version": "1.0.0",
+  "displayName": "Combat System",
+  "description": "Hitbox and Hurtbox combat system for Unity",
+  "unity": "2021.3",
+  "documentationUrl": "",
+  "changelogUrl": "",
+  "licensesUrl": "",
+  "keywords": [
+    "combat",
+    "hitbox",
+    "hurtbox",
+    "damage"
+  ],
+  "author": {
+    "name": "Your Name",
+    "email": "",
+    "url": ""
+  }
+}
