@@ -1,6 +1,6 @@
 {
-    "name": "Combat",
-    "rootNamespace": "Combat",
+    "name": "MirrorRPG",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
