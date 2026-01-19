@@ -150,6 +150,10 @@ namespace MirrorRPG.Buff
 
             switch (data.stackBehavior)
             {
+                case StackBehavior.Ignore:
+                    // Do nothing, just return existing
+                    return existing;
+
                 case StackBehavior.RefreshDuration:
                     existing.RefreshDuration();
                     return existing;

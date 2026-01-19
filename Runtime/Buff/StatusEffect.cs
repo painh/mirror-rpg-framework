@@ -44,6 +44,13 @@ namespace MirrorRPG.Buff
     public enum StackBehavior
     {
         /// <summary>
+        /// Ignore if buff already exists
+        /// 이미 버프가 있으면 무시
+        /// </summary>
+        [UnityEngine.InspectorName("무시")]
+        Ignore,
+
+        /// <summary>
         /// Refresh duration, don't add stacks
         /// 지속시간만 갱신, 스택 유지
         /// </summary>
