@@ -11,9 +11,6 @@ namespace MirrorRPG.Buff
     /// </summary>
     public class BuffHandler : MonoBehaviour
     {
-        [Header("References")]
-        [SerializeField] private StatContainer statContainer;
-
         [Header("Effect Spawn Point")]
         [SerializeField] private Transform effectSpawnPoint;
 
@@ -28,8 +25,13 @@ namespace MirrorRPG.Buff
         private StatusEffect cachedStatusEffects = StatusEffect.None;
         private bool statusEffectsDirty = true;
 
-        // Owner reference (if IBuffable)
+        // Owner reference (IBuffable provides StatContainer)
         private IBuffable buffableOwner;
+
+        /// <summary>
+        /// StatContainer from IBuffable owner
+        /// </summary>
+        private StatContainer StatContainer => buffableOwner?.StatContainer;
 
         /// <summary>
         /// All active buff instances
@@ -73,12 +75,12 @@ namespace MirrorRPG.Buff
 
         private void Awake()
         {
-            if (statContainer == null)
-            {
-                statContainer = GetComponent<StatContainer>();
-            }
-
             buffableOwner = GetComponent<IBuffable>();
+
+            if (buffableOwner == null)
+            {
+                Debug.LogError($"[BuffHandler] {name}: IBuffable owner not found! BuffHandler requires an IBuffable component.");
+            }
 
             if (effectSpawnPoint == null)
             {
@@ -160,7 +162,7 @@ namespace MirrorRPG.Buff
                     if (existing.AddStack())
                     {
                         existing.RefreshDuration();
-                        existing.RefreshModifiers(statContainer);
+                        existing.RefreshModifiers(StatContainer);
                     }
                     else
                     {
@@ -198,7 +200,7 @@ namespace MirrorRPG.Buff
             allBuffs.Add(buff);
 
             // Apply stat modifiers
-            buff.ApplyModifiers(statContainer);
+            buff.ApplyModifiers(StatContainer);
 
             // Mark status effects dirty
             if (buff.Data.statusEffects != StatusEffect.None)
@@ -245,7 +247,7 @@ namespace MirrorRPG.Buff
             allBuffs.Remove(buff);
 
             // Remove stat modifiers
-            buff.RemoveModifiers(statContainer);
+            buff.RemoveModifiers(StatContainer);
 
             // Mark status effects dirty
             if (buff.Data.statusEffects != StatusEffect.None)
@@ -280,19 +282,19 @@ namespace MirrorRPG.Buff
         /// </summary>
         private void ProcessTick(BuffInstance buff)
         {
-            if (buff.Data.tickDamage != 0 && statContainer != null)
+            if (buff.Data.tickDamage != 0 && StatContainer != null)
             {
                 float damage = buff.Data.tickDamage * buff.Stacks;
 
                 if (damage > 0)
                 {
                     // Damage
-                    statContainer.TakeDamage(damage);
+                    StatContainer.TakeDamage(damage);
                 }
                 else
                 {
                     // Healing (negative damage)
-                    statContainer.Heal(-damage);
+                    StatContainer.Heal(-damage);
                 }
 
                 OnBuffTick?.Invoke(buff, damage);
@@ -493,7 +495,7 @@ namespace MirrorRPG.Buff
 
         private void OnBuffStacksChanged(BuffInstance buff, int oldStacks, int newStacks)
         {
-            buff.RefreshModifiers(statContainer);
+            buff.RefreshModifiers(StatContainer);
         }
 
         #region Debug

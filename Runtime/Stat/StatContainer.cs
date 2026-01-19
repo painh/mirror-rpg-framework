@@ -1,23 +1,17 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
 
 namespace MirrorRPG.Stat
 {
     /// <summary>
-    /// Component that holds and manages stats for an entity
+    /// Holds and manages stats for an entity (pure class, not MonoBehaviour)
     /// </summary>
-    public class StatContainer : MonoBehaviour
+    [Serializable]
+    public class StatContainer
     {
-        [Header("Configuration")]
-        [Tooltip("The stat set defining which stats this entity has")]
-        [SerializeField] private StatSetDefinition statSet;
-
-        [Header("Debug")]
-        [SerializeField] private bool showDebugInfo = false;
-
         // Runtime stats
         private Dictionary<string, Stat> stats = new Dictionary<string, Stat>();
+        private StatSetDefinition statSet;
         private bool isInitialized = false;
 
         // Built-in stat IDs (constants for common stats)
@@ -44,6 +38,11 @@ namespace MirrorRPG.Stat
         public StatSetDefinition StatSet => statSet;
 
         /// <summary>
+        /// Is initialized?
+        /// </summary>
+        public bool IsInitialized => isInitialized;
+
+        /// <summary>
         /// Event fired when any stat value changes
         /// </summary>
         public event Action<string, Stat> OnStatChanged;
@@ -58,15 +57,23 @@ namespace MirrorRPG.Stat
         /// </summary>
         public event Action<string, ResourceStat> OnResourceDepleted;
 
-        protected virtual void Awake()
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public StatContainer() { }
+
+        /// <summary>
+        /// Constructor with stat set (auto-initializes)
+        /// </summary>
+        public StatContainer(StatSetDefinition statSet)
         {
-            InitializeStats();
+            Initialize(statSet);
         }
 
         /// <summary>
-        /// Set the stat set and reinitialize stats (for runtime setup)
+        /// Initialize with a stat set
         /// </summary>
-        public void SetStatSet(StatSetDefinition newStatSet)
+        public void Initialize(StatSetDefinition newStatSet)
         {
             statSet = newStatSet;
             isInitialized = false;
@@ -77,17 +84,12 @@ namespace MirrorRPG.Stat
         /// <summary>
         /// Initialize stats from the stat set
         /// </summary>
-        public void InitializeStats()
+        private void InitializeStats()
         {
             if (isInitialized) return;
+            if (statSet == null) return;
 
             stats.Clear();
-
-            if (statSet == null)
-            {
-                Debug.LogWarning($"[StatContainer] {name}: No StatSet assigned!");
-                return;
-            }
 
             foreach (var entry in statSet.stats)
             {
@@ -402,33 +404,6 @@ namespace MirrorRPG.Stat
                     }
                 }
             }
-        }
-
-        #endregion
-
-        #region Debug
-
-        private void OnGUI()
-        {
-            if (!showDebugInfo) return;
-
-            GUILayout.BeginArea(new Rect(10, 10, 300, 500));
-            GUILayout.Label($"=== {name} Stats ===");
-
-            foreach (var kvp in stats)
-            {
-                var stat = kvp.Value;
-                if (stat is ResourceStat rs)
-                {
-                    GUILayout.Label($"{kvp.Key}: {rs.CurrentValue:F1}/{rs.MaxValue:F1} ({rs.Percent:P0})");
-                }
-                else
-                {
-                    GUILayout.Label($"{kvp.Key}: {stat.Value:F1} (base: {stat.BaseValue:F1})");
-                }
-            }
-
-            GUILayout.EndArea();
         }
 
         #endregion
