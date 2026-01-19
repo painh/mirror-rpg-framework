@@ -110,4 +110,34 @@ namespace MirrorRPG.Buff
         /// </summary>
         OnDeath = 1 << 4
     }
+
+    /// <summary>
+    /// Fade effect type for buff visual effects
+    /// </summary>
+    public enum BuffFadeType
+    {
+        /// <summary>
+        /// No fade effect
+        /// </summary>
+        [UnityEngine.InspectorName("없음")]
+        None,
+
+        /// <summary>
+        /// Fade alpha (requires transparent shader)
+        /// </summary>
+        [UnityEngine.InspectorName("알파 페이드")]
+        Alpha,
+
+        /// <summary>
+        /// Scale from 0 to 1
+        /// </summary>
+        [UnityEngine.InspectorName("스케일")]
+        Scale,
+
+        /// <summary>
+        /// Both alpha and scale
+        /// </summary>
+        [UnityEngine.InspectorName("알파 + 스케일")]
+        Both
+    }
 }

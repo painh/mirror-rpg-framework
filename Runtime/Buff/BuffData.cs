@@ -36,6 +36,12 @@ namespace MirrorRPG.Buff
         [Tooltip("Effect prefab to spawn on buff remove")]
         public GameObject removeEffectPrefab;
 
+        [Tooltip("Fade in/out effect when apply/remove VFX is not set")]
+        public BuffFadeType fadeType = BuffFadeType.None;
+
+        [Tooltip("Duration of fade effect in seconds")]
+        public float fadeDuration = 0.5f;
+
         [Header("Duration")]
         [Tooltip("Duration in seconds (0 = permanent until manually removed)")]
         public float duration = 10f;
