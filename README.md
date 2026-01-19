@@ -5,6 +5,8 @@ Unity용 RPG 게임 개발을 위한 재사용 가능한 핵심 시스템 패키
 ## 기능
 
 - **Combat 시스템**: 히트박스/허트박스 기반 전투, 데미지 타입 및 처리
+- **Stat 시스템**: 스탯 정의, 수정자, 리소스 스탯 (HP/MP/스태미나)
+- **Buff 시스템**: 버프/디버프, 상태이상, DoT/HoT, 스택 관리
 - **Entity 시스템**: 이동, 타겟팅, 인지, 공격 인터페이스
 - **StateMachine 시스템**: 범용 상태 머신 및 애니메이션 연동
 - **Skill 시스템**: 스킬 정의 및 다단히트 타이밍 관리
@@ -28,6 +30,55 @@ ln -s /path/to/mirror-rpg-framework /path/to/your-project/Packages/com.unity.mir
 ```
 
 ## 시스템 개요
+
+### Stat 시스템
+
+스탯 정의 및 수정자 기반 계산
+
+```csharp
+using MirrorRPG.Stat;
+
+// StatContainer로 스탯 관리
+var container = GetComponent<StatContainer>();
+float attack = container.GetStatValue("Attack");
+
+// 수정자 적용 (버프 등에서)
+var modifier = StatModifier.PercentAdd(0.3f, source); // +30%
+container.AddModifier("Attack", modifier);
+
+// 리소스 스탯 (HP, MP 등)
+container.TakeDamage(50f);
+container.Heal(30f);
+float healthPercent = container.HealthPercent;
+```
+
+### Buff 시스템
+
+버프/디버프 및 상태이상 관리
+
+```csharp
+using MirrorRPG.Buff;
+
+// 버프 적용
+var buffHandler = GetComponent<BuffHandler>();
+buffHandler.ApplyBuff(poisonBuffData, attacker);
+
+// 상태이상 체크
+if (buffHandler.HasStatusEffect(StatusEffect.Stun))
+{
+    // 스턴 상태 처리
+}
+
+// 디버프 해제
+buffHandler.DispelDebuffs(maxCount: 2);
+```
+
+**BuffData SO 설정:**
+- 스탯 수정 (Flat, PercentAdd, PercentMult)
+- 상태이상 (Stun, Slow, Silence, Root 등)
+- DoT/HoT (틱 데미지/힐)
+- 스택 정책 (RefreshDuration, AddDuration, Independent)
+- 해제 조건 (Time, OnHit, OnUseCount)
 
 ### Combat (Core, Hitbox, Hurtbox)
 
@@ -101,31 +152,45 @@ public class MySkillData : ScriptableObject, ISkillData
 com.unity.mirror-rpg/
 ├── Runtime/
 │   ├── Core/                    # 데미지 시스템
-│   │   ├── IDamageable.cs       # 데미지 받는 엔티티 인터페이스
-│   │   ├── IDamageDealer.cs     # 데미지 주는 오브젝트 인터페이스
-│   │   ├── DamageInfo.cs        # 데미지 정보 구조체
-│   │   ├── DamageType.cs        # 데미지 속성 (Flags enum)
-│   │   └── DamageHelper.cs      # 데미지 처리 유틸리티
+│   │   ├── IDamageable.cs
+│   │   ├── IDamageDealer.cs
+│   │   ├── DamageInfo.cs
+│   │   ├── DamageType.cs
+│   │   └── DamageHelper.cs
+│   ├── Stat/                    # 스탯 시스템
+│   │   ├── Stat.cs              # 기본 스탯 클래스
+│   │   ├── ResourceStat.cs      # 리소스 스탯 (HP/MP)
+│   │   ├── StatModifier.cs      # 스탯 수정자
+│   │   ├── StatDefinition.cs    # 스탯 정의 SO
+│   │   ├── StatSetDefinition.cs # 스탯 세트 SO
+│   │   └── StatContainer.cs     # 스탯 관리 컴포넌트
+│   ├── Buff/                    # 버프 시스템
+│   │   ├── BuffData.cs          # 버프 정의 SO
+│   │   ├── BuffInstance.cs      # 런타임 버프 인스턴스
+│   │   ├── BuffHandler.cs       # 버프 관리 컴포넌트
+│   │   ├── IBuffable.cs         # 버프 대상 인터페이스
+│   │   ├── StatusEffect.cs      # 상태이상 Flags enum
+│   │   └── BuffStatModifier.cs  # 버프용 스탯 수정자
 │   ├── Entity/                  # 엔티티 인터페이스
-│   │   ├── IMovable.cs          # 이동 인터페이스
-│   │   └── ITargetable.cs       # 타겟팅/인지/공격 인터페이스
+│   │   ├── IMovable.cs
+│   │   └── ITargetable.cs
 │   ├── Hurtbox/                 # 허트박스 시스템
-│   │   ├── Hurtbox.cs           # 개별 허트박스
-│   │   ├── HurtboxManager.cs    # 허트박스 매니저
-│   │   └── HurtboxData.cs       # 설정 ScriptableObject
+│   │   ├── Hurtbox.cs
+│   │   ├── HurtboxManager.cs
+│   │   └── HurtboxData.cs
 │   ├── Hitbox/                  # 히트박스 시스템
-│   │   ├── WeaponHitbox.cs      # 무기 히트박스
+│   │   ├── WeaponHitbox.cs
 │   │   └── WeaponHitboxController.cs
 │   ├── Skill/                   # 스킬 시스템
-│   │   ├── ISkillData.cs        # 스킬 데이터 인터페이스
-│   │   ├── SkillHitTiming.cs    # 히트 타이밍 정의
-│   │   └── SkillTimingHelper.cs # 타이밍 유틸리티
+│   │   ├── ISkillData.cs
+│   │   ├── SkillHitTiming.cs
+│   │   └── SkillTimingHelper.cs
 │   └── StateMachine/            # 상태 머신
-│       ├── IStateMachineOwner.cs    # 소유자 인터페이스
-│       ├── IAnimationController.cs  # 애니메이션 인터페이스
-│       ├── AnimatorAdapter.cs       # Animator 어댑터
-│       ├── StateMachineBase.cs      # 상태 머신 베이스
-│       └── StateBase.cs             # 상태 베이스
+│       ├── IStateMachineOwner.cs
+│       ├── IAnimationController.cs
+│       ├── AnimatorAdapter.cs
+│       ├── StateMachineBase.cs
+│       └── StateBase.cs
 └── Editor/
     └── (에디터 도구 추가 예정)
 ```
@@ -133,6 +198,8 @@ com.unity.mirror-rpg/
 ## 네임스페이스
 
 - `Combat` - 데미지 시스템
+- `MirrorRPG.Stat` - 스탯 시스템
+- `MirrorRPG.Buff` - 버프/디버프 시스템
 - `MirrorRPG.Entity` - 엔티티 인터페이스
 - `MirrorRPG.Skill` - 스킬 시스템
 - `MirrorRPG.StateMachine` - 상태 머신
