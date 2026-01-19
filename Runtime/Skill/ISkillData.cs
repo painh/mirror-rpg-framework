@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Combat;
+using MirrorRPG.Combat;
 
 namespace MirrorRPG.Skill
 {
@@ -30,9 +31,19 @@ namespace MirrorRPG.Skill
         DamageType DamageTypes { get; }
 
         /// <summary>
-        /// Hit timing configurations for multi-hit skills
+        /// Hit timing configurations for multi-hit skills (Legacy)
         /// </summary>
         IReadOnlyList<SkillHitTiming> HitTimings { get; }
+
+        /// <summary>
+        /// Skill actions (new action system)
+        /// </summary>
+        IReadOnlyList<SkillAction> Actions { get; }
+
+        /// <summary>
+        /// Combat effect to apply on hit (optional)
+        /// </summary>
+        CombatEffect CombatEffect { get; }
 
         /// <summary>
         /// Animation trigger name
