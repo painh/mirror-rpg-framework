@@ -4,13 +4,20 @@ namespace MirrorRPG.Skill.Actions
 {
     /// <summary>
     /// Action that spawns a projectile at a specific time
+    /// Supports both direct prefab reference and Resources path loading
     /// </summary>
     [System.Serializable]
     public class SpawnProjectileAction : SkillAction
     {
         [Header("Projectile Settings")]
-        [Tooltip("Projectile prefab to spawn")]
+        [Tooltip("Projectile prefab to spawn (직접 참조)")]
         public GameObject projectilePrefab;
+
+        [Tooltip("Resources 경로로 프리팹 로드 (예: 'Projectile')")]
+        public string projectilePrefabPath = "Projectile";
+
+        [Tooltip("ProjectileData 경로 (예: 'ProjectileData/Fireball')")]
+        public string projectileDataPath;
 
         [Tooltip("Spawn position offset from spawn point")]
         public Vector3 spawnOffset = Vector3.zero;
@@ -39,7 +46,14 @@ namespace MirrorRPG.Skill.Actions
 
         public override void Execute(SkillActionContext context)
         {
-            if (projectilePrefab == null)
+            // Load prefab
+            GameObject prefab = projectilePrefab;
+            if (prefab == null && !string.IsNullOrEmpty(projectilePrefabPath))
+            {
+                prefab = Resources.Load<GameObject>(projectilePrefabPath);
+            }
+
+            if (prefab == null)
             {
                 Debug.LogWarning("[SpawnProjectileAction] Projectile prefab is null");
                 return;
@@ -55,16 +69,27 @@ namespace MirrorRPG.Skill.Actions
             // Spawn projectile(s)
             if (count == 1)
             {
-                SpawnSingle(context, basePosition, baseRotation);
+                SpawnSingle(context, prefab, basePosition, baseRotation, direction);
             }
             else
             {
-                SpawnMultiple(context, basePosition, baseRotation);
+                SpawnMultiple(context, prefab, basePosition, baseRotation, direction);
             }
         }
 
         private Vector3 GetDirection(SkillActionContext context, Transform spawnPoint)
         {
+            // Use IAimProvider interface if available
+            if (context.Owner != null)
+            {
+                var aimProvider = context.Owner.GetComponent<IAimProvider>();
+                if (aimProvider != null)
+                {
+                    Vector3 aimTarget = aimProvider.GetAimTarget();
+                    return (aimTarget - spawnPoint.position).normalized;
+                }
+            }
+
             // Try to aim at target
             if (aimAtTarget && context.Target != null)
             {
@@ -88,13 +113,13 @@ namespace MirrorRPG.Skill.Actions
             return spawnPoint.forward;
         }
 
-        private void SpawnSingle(SkillActionContext context, Vector3 position, Quaternion rotation)
+        private void SpawnSingle(SkillActionContext context, GameObject prefab, Vector3 position, Quaternion rotation, Vector3 direction)
         {
-            var projectile = Object.Instantiate(projectilePrefab, position, rotation);
-            InitializeProjectile(context, projectile);
+            var projectileObj = Object.Instantiate(prefab, position, rotation);
+            InitializeProjectile(context, projectileObj, direction);
         }
 
-        private void SpawnMultiple(SkillActionContext context, Vector3 position, Quaternion baseRotation)
+        private void SpawnMultiple(SkillActionContext context, GameObject prefab, Vector3 position, Quaternion baseRotation, Vector3 direction)
         {
             float totalSpread = spreadAngle * (count - 1);
             float startAngle = -totalSpread / 2f;
@@ -103,33 +128,46 @@ namespace MirrorRPG.Skill.Actions
             {
                 float angle = startAngle + (spreadAngle * i);
                 Quaternion rotation = baseRotation * Quaternion.Euler(0f, angle, 0f);
+                Vector3 spreadDir = rotation * Vector3.forward;
 
-                var projectile = Object.Instantiate(projectilePrefab, position, rotation);
-                InitializeProjectile(context, projectile);
+                var projectileObj = Object.Instantiate(prefab, position, rotation);
+                InitializeProjectile(context, projectileObj, spreadDir);
             }
         }
 
-        private void InitializeProjectile(SkillActionContext context, GameObject projectile)
+        private void InitializeProjectile(SkillActionContext context, GameObject projectileObj, Vector3 direction)
         {
-            // Store context data for projectile to use
-            // The projectile script should look for this
-            context.CustomData["DamageMultiplier"] = damageMultiplier;
-            context.CustomData["Owner"] = context.Owner;
-
-            // Try to initialize via interface or specific component
-            var initializable = projectile.GetComponent<IProjectileInitializable>();
+            // Try IProjectileInitializable interface first
+            var initializable = projectileObj.GetComponent<IProjectileInitializable>();
             if (initializable != null)
             {
-                initializable.Initialize(context.Owner, damageMultiplier);
+                initializable.Initialize(context.Owner, direction, projectileDataPath, damageMultiplier);
+                return;
             }
+
+            // Store context data for projectile to use
+            context.CustomData["DamageMultiplier"] = damageMultiplier;
+            context.CustomData["Owner"] = context.Owner;
+            context.CustomData["Direction"] = direction;
+            context.CustomData["ProjectileDataPath"] = projectileDataPath;
         }
     }
 
     /// <summary>
     /// Interface for projectiles that can be initialized by SpawnProjectileAction
+    /// Implement this in your project's Projectile class
     /// </summary>
     public interface IProjectileInitializable
     {
-        void Initialize(GameObject owner, float damageMultiplier);
+        void Initialize(GameObject owner, Vector3 direction, string dataPath, float damageMultiplier);
+    }
+
+    /// <summary>
+    /// Interface for aim systems that provide targeting information
+    /// Implement this in your project's AimSystem class
+    /// </summary>
+    public interface IAimProvider
+    {
+        Vector3 GetAimTarget();
     }
 }
