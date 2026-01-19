@@ -45,22 +45,30 @@ namespace MirrorRPG.Buff
     {
         /// <summary>
         /// Refresh duration, don't add stacks
+        /// 지속시간만 갱신, 스택 유지
         /// </summary>
+        [UnityEngine.InspectorName("지속시간 갱신")]
         RefreshDuration,
 
         /// <summary>
         /// Add to remaining duration
+        /// 남은 지속시간에 추가
         /// </summary>
+        [UnityEngine.InspectorName("지속시간 누적")]
         AddDuration,
 
         /// <summary>
         /// Add new stack (up to max), each with own duration
+        /// 각 스택이 개별 지속시간 보유
         /// </summary>
+        [UnityEngine.InspectorName("독립 스택")]
         Independent,
 
         /// <summary>
         /// Add stack and refresh all stack durations
+        /// 스택 추가 및 전체 지속시간 갱신
         /// </summary>
+        [UnityEngine.InspectorName("스택 추가 + 갱신")]
         StackAndRefresh
     }
 
