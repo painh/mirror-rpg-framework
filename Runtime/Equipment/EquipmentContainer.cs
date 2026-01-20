@@ -102,6 +102,45 @@ namespace MirrorRPG.Equipment
         }
 
         /// <summary>
+        /// Equip an item to a specific slot (for category-based equipping)
+        /// </summary>
+        /// <param name="item">Item to equip</param>
+        /// <param name="targetSlot">Target slot to equip to</param>
+        /// <returns>Previously equipped item (or null)</returns>
+        public ItemInstance EquipToSlot(ItemInstance item, EquipmentSlotType targetSlot)
+        {
+            if (item == null) return null;
+            if (!item.IsEquipment) return null;
+            if (targetSlot == EquipmentSlotType.None) return null;
+
+            // Get previously equipped item
+            var previousItem = GetEquippedItem(targetSlot);
+
+            // Unequip previous item (remove stats)
+            if (previousItem != null)
+            {
+                previousItem.RemoveEquipmentStats(statContainer);
+            }
+
+            // Equip new item
+            equippedItems[targetSlot] = item;
+
+            // Apply new item stats
+            item.ApplyEquipmentStats(statContainer);
+
+            // Fire events
+            OnEquipmentChanged?.Invoke(targetSlot, previousItem, item);
+            OnItemEquipped?.Invoke(targetSlot, item);
+
+            if (previousItem != null)
+            {
+                OnItemUnequipped?.Invoke(targetSlot, previousItem);
+            }
+
+            return previousItem;
+        }
+
+        /// <summary>
         /// Unequip item from slot
         /// </summary>
         /// <param name="slot">Slot to unequip</param>
