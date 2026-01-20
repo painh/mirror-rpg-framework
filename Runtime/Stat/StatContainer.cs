@@ -25,6 +25,17 @@ namespace MirrorRPG.Stat
             public const string Speed = "Speed";
             public const string CritRate = "CritRate";
             public const string CritDamage = "CritDamage";
+
+            // Resistance stats
+            public const string PhysicalHitResist = "PhysicalHitResist";
+            public const string PhysicalSlashResist = "PhysicalSlashResist";
+            public const string FireResist = "FireResist";
+            public const string IceResist = "IceResist";
+            public const string LightningResist = "LightningResist";
+            public const string LightResist = "LightResist";
+            public const string DarknessResist = "DarknessResist";
+            public const string PoisonResist = "PoisonResist";
+            public const string BleedingResist = "BleedingResist";
         }
 
         /// <summary>
