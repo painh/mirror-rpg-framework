@@ -6,8 +6,8 @@ namespace MirrorRPG.Inventory
     public interface IInventoryOwner
     {
         /// <summary>
-        /// The inventory container
+        /// The grid-based inventory container (Diablo-style)
         /// </summary>
-        InventoryContainer Inventory { get; }
+        GridInventoryContainer GridInventory { get; }
     }
 }
