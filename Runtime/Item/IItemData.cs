@@ -34,9 +34,14 @@ namespace MirrorRPG.Item
         ItemRarity Rarity { get; }
 
         /// <summary>
-        /// Equipment slot (None if not equippable)
+        /// Equipment slot (None if not equippable) - Legacy, use EquipmentCategory instead
         /// </summary>
         EquipmentSlotType EquipmentSlot { get; }
+
+        /// <summary>
+        /// Equipment category (determines which slot types can equip this item)
+        /// </summary>
+        EquipmentCategory EquipmentCategory { get; }
 
         /// <summary>
         /// Can multiple items stack in one slot?
