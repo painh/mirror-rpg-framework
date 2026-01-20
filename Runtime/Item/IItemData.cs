@@ -49,6 +49,16 @@ namespace MirrorRPG.Item
         int MaxStackSize { get; }
 
         /// <summary>
+        /// Grid width in inventory (1 = 1 cell)
+        /// </summary>
+        int GridWidth { get; }
+
+        /// <summary>
+        /// Grid height in inventory (1 = 1 cell)
+        /// </summary>
+        int GridHeight { get; }
+
+        /// <summary>
         /// Stat modifiers when equipped (reuses buff system)
         /// </summary>
         IReadOnlyList<BuffStatModifier> StatModifiers { get; }
