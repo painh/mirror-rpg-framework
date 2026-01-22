@@ -10,19 +10,11 @@ namespace MirrorRPG.Skill.Actions
     public class SpawnProjectileAction : SkillAction
     {
         [Header("Projectile Settings")]
-        [Tooltip("Projectile prefab to spawn (직접 참조)")]
+        [Tooltip("Projectile prefab to spawn")]
         public GameObject projectilePrefab;
 
-        [Tooltip("ProjectileData ScriptableObject (직접 참조)")]
+        [Tooltip("ProjectileData ScriptableObject")]
         public ScriptableObject projectileData;
-
-        [Tooltip("Resources 경로로 프리팹 로드 (예: 'Projectile') - projectilePrefab이 없을 때 사용")]
-        [System.Obsolete("Use projectilePrefab instead")]
-        public string projectilePrefabPath = "Projectile";
-
-        [Tooltip("ProjectileData 경로 (예: 'ProjectileData/Fireball') - projectileData가 없을 때 사용")]
-        [System.Obsolete("Use projectileData instead")]
-        public string projectileDataPath;
 
         [Tooltip("Spawn position offset from spawn point")]
         public Vector3 spawnOffset = Vector3.zero;
@@ -51,14 +43,7 @@ namespace MirrorRPG.Skill.Actions
 
         public override void Execute(SkillActionContext context)
         {
-            // Load prefab
-            GameObject prefab = projectilePrefab;
-            if (prefab == null && !string.IsNullOrEmpty(projectilePrefabPath))
-            {
-                prefab = Resources.Load<GameObject>(projectilePrefabPath);
-            }
-
-            if (prefab == null)
+            if (projectilePrefab == null)
             {
                 Debug.LogWarning("[SpawnProjectileAction] Projectile prefab is null");
                 return;
@@ -142,19 +127,11 @@ namespace MirrorRPG.Skill.Actions
 
         private void InitializeProjectile(SkillActionContext context, GameObject projectileObj, Vector3 direction)
         {
-            // Try IProjectileInitializable interface first (직접 참조 버전)
+            // Try IProjectileInitializable interface first
             var initializable = projectileObj.GetComponent<IProjectileInitializable>();
             if (initializable != null)
             {
-                // projectileData 직접 참조 우선, 없으면 경로 사용
-                if (projectileData != null)
-                {
-                    initializable.Initialize(context.Owner, direction, projectileData, damageMultiplier);
-                }
-                else
-                {
-                    initializable.InitializeWithPath(context.Owner, direction, projectileDataPath, damageMultiplier);
-                }
+                initializable.Initialize(context.Owner, direction, projectileData, damageMultiplier);
                 return;
             }
 
@@ -163,7 +140,6 @@ namespace MirrorRPG.Skill.Actions
             context.CustomData["Owner"] = context.Owner;
             context.CustomData["Direction"] = direction;
             context.CustomData["ProjectileData"] = projectileData;
-            context.CustomData["ProjectileDataPath"] = projectileDataPath;
         }
     }
 
@@ -174,14 +150,9 @@ namespace MirrorRPG.Skill.Actions
     public interface IProjectileInitializable
     {
         /// <summary>
-        /// Initialize with direct ProjectileData reference (권장)
+        /// Initialize projectile with data
         /// </summary>
         void Initialize(GameObject owner, Vector3 direction, ScriptableObject data, float damageMultiplier);
-
-        /// <summary>
-        /// Initialize with Resources path (레거시)
-        /// </summary>
-        void InitializeWithPath(GameObject owner, Vector3 direction, string dataPath, float damageMultiplier);
     }
 
     /// <summary>
