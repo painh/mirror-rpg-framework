@@ -59,11 +59,11 @@ namespace MirrorRPG.Skill.Actions
             // Spawn projectile(s)
             if (count == 1)
             {
-                SpawnSingle(context, prefab, basePosition, baseRotation, direction);
+                SpawnSingle(context, projectilePrefab, basePosition, baseRotation, direction);
             }
             else
             {
-                SpawnMultiple(context, prefab, basePosition, baseRotation, direction);
+                SpawnMultiple(context, projectilePrefab, basePosition, baseRotation, direction);
             }
         }
 
