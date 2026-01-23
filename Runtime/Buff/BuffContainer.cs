@@ -255,24 +255,15 @@ namespace MirrorRPG.Buff
 
         /// <summary>
         /// Process a tick effect (DoT/HoT)
+        /// 데미지/힐 처리는 OnBuffTick 이벤트 구독자(Entity)에서 처리
         /// </summary>
         private void ProcessTick(BuffInstance buff)
         {
-            if (buff.Data.tickDamage != 0 && statContainer != null)
+            if (buff.Data.tickDamage != 0)
             {
                 float damage = buff.Data.tickDamage * buff.Stacks;
 
-                if (damage > 0)
-                {
-                    // Damage
-                    statContainer.TakeDamage(damage);
-                }
-                else
-                {
-                    // Healing (negative damage)
-                    statContainer.Heal(-damage);
-                }
-
+                // 이벤트로 데미지/힐 양 전달 (Entity에서 TakeDamage/Heal 파이프라인 처리)
                 OnBuffTick?.Invoke(buff, damage);
             }
         }
