@@ -26,6 +26,9 @@ namespace MirrorRPG.Stat
             public const string CritRate = "CritRate";
             public const string CritDamage = "CritDamage";
 
+            // Stagger (경직 저항)
+            public const string StaggerResistance = "StaggerResistance";
+
             // Resistance stats
             public const string PhysicalHitResist = "PhysicalHitResist";
             public const string PhysicalSlashResist = "PhysicalSlashResist";
@@ -361,6 +364,15 @@ namespace MirrorRPG.Stat
         /// Shortcut: Restore stamina
         /// </summary>
         public float RestoreStamina(float amount) => RestoreResource(StatIds.Stamina, amount);
+
+        #endregion
+
+        #region Stagger Shortcuts
+
+        /// <summary>
+        /// Shortcut: Stagger resistance (임계값)
+        /// </summary>
+        public float StaggerResistance => GetStatValue(StatIds.StaggerResistance);
 
         #endregion
 

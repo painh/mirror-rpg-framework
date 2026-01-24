@@ -83,6 +83,9 @@ namespace MirrorRPG.Buff
         [Tooltip("Damage type for tick damage")]
         public DamageType tickDamageType = DamageType.None;
 
+        [Tooltip("틱 당 경직(Stagger) 누적량 (0이면 경직 누적 안함, 보통 DoT는 0으로 설정)")]
+        public float tickStaggerDamage = 0f;
+
         [Header("Special")]
         [Tooltip("Can this buff be dispelled?")]
         public bool dispellable = true;
