@@ -24,7 +24,13 @@ namespace Combat
         [Tooltip("디버그 로그 출력")]
         public bool debugLog = false;
 
-        [Tooltip("Gizmo 색상")]
+        [Tooltip("비활성 상태 Gizmo 색상")]
+        public Color inactiveColor = new Color(0.5f, 0f, 0f, 0.5f); // 어두운 빨간색
+
+        [Tooltip("활성 상태 Gizmo 색상")]
+        public Color activeColor = new Color(0f, 1f, 0f, 0.7f); // 밝은 녹색
+
+        [Tooltip("Gizmo 색상 (레거시, 비활성시 사용)")]
         public Color gizmoColor = Color.red;
 
         // 이번 공격에서 이미 히트한 타겟 목록
@@ -185,7 +191,8 @@ namespace Combat
 
             if (hitboxCollider == null) return;
 
-            Gizmos.color = isActive ? gizmoColor : new Color(gizmoColor.r, gizmoColor.g, gizmoColor.b, 0.3f);
+            // 활성: 밝은 녹색, 비활성: 어두운 빨간색
+            Gizmos.color = isActive ? activeColor : inactiveColor;
             Gizmos.matrix = transform.localToWorldMatrix;
 
             if (hitboxCollider is SphereCollider sphere)
