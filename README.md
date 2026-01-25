@@ -116,7 +116,7 @@ com.unity.mirror-rpg/
 │   ├── Core/          # 데미지 시스템
 │   ├── Entity/        # 엔티티 인터페이스
 │   ├── EventGraph/    # 이벤트 그래프 시스템
-│   ├── Hitbox/        # 히트박스
+│   ├── Hitbox/        # 히트박스 (WeaponHitbox, ShieldHitbox)
 │   ├── Hurtbox/       # 허트박스
 │   ├── Skill/         # 스킬 시스템
 │   ├── Stat/          # 스탯 시스템
@@ -149,6 +149,46 @@ com.unity.mirror-rpg/
 | `SkillData` | MirrorRPG > Skill > Skill Data |
 | `CombatEffect` | MirrorRPG > Combat > Combat Effect |
 | `EventGraphAsset` | MirrorRPG > Event Graph |
+
+## Hitbox 시스템
+
+### WeaponHitbox
+무기에 붙는 공격 충돌체. 공격 중에만 활성화되어 대상에게 데미지를 줍니다.
+
+```csharp
+// 히트박스 초기화
+weaponHitbox.Initialize(ownerGameObject);
+weaponHitbox.SetController(hitboxController);
+
+// 공격 시작/종료
+weaponHitbox.BeginAttack();
+weaponHitbox.EndAttack();
+```
+
+### ShieldHitbox
+방패에 붙는 가드 충돌체. 가드 중에만 활성화되어 공격을 막습니다.
+
+```csharp
+// 콜백 기반 가드 처리
+shieldHitbox.Initialize(ownerGameObject);
+
+// 가드 히트 콜백 등록
+shieldHitbox.OnGuardHitCallback = (damage, hitPoint, attacker) => {
+    // 가드 성공 시 true, 가드 브레이크 시 false 반환
+    return HandleGuard(damage);
+};
+
+// 투사체 가드 콜백 (선택)
+shieldHitbox.OnProjectileGuardHitCallback = (damage, hitPoint, attacker, projectile) => {
+    bool success = HandleGuard(damage);
+    if (success) Destroy(projectile);
+    return success;
+};
+
+// 가드 활성화/비활성화
+shieldHitbox.SetActive(true);
+shieldHitbox.SetActive(false);
+```
 
 ## 라이센스
 
