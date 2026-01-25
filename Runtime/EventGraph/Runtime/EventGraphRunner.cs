@@ -276,6 +276,24 @@ namespace MirrorRPG.EventGraph
                     handler.TriggerGameEvent("ShowAchievement", node.Parameter);
                     break;
 
+                case GameEventType.AcceptMission:
+                    // NPC 컨텍스트의 미션 수락 (TargetId가 비어있으면 현재 NPC의 미션 사용)
+                    handler.TriggerGameEvent("AcceptMission", new
+                    {
+                        MissionId = node.TargetId,  // 비어있으면 NPC 컨텍스트 사용
+                        Parameter = node.Parameter
+                    });
+                    break;
+
+                case GameEventType.AcceptMissionById:
+                    // 특정 미션 ID로 미션 수락
+                    handler.TriggerGameEvent("AcceptMissionById", new
+                    {
+                        MissionId = node.TargetId,
+                        Parameter = node.Parameter
+                    });
+                    break;
+
                 default:
                     handler.TriggerGameEvent(node.EventId, new
                     {

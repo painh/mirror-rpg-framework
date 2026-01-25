@@ -42,6 +42,8 @@ namespace MirrorRPG.EventGraph.Nodes
     {
         // 미션 관련
         StartMission,
+        AcceptMission,          // NPC 컨텍스트에서 미션 수락
+        AcceptMissionById,      // 특정 미션 ID로 미션 수락
         CompleteMission,
         FailMission,
         UpdateMissionProgress,
