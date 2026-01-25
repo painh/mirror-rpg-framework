@@ -30,6 +30,7 @@ ln -s /path/to/mirror-rpg-framework /path/to/your-project/Packages/com.unity.mir
 | **Combat** | 데미지 처리, 히트박스/허트박스 | [combat-system.md](docs/combat-system.md) |
 | **StateMachine** | 범용 상태 머신, 애니메이션 연동 | [statemachine-system.md](docs/statemachine-system.md) |
 | **Entity** | 이동, 타겟팅 인터페이스 | [entity-system.md](docs/entity-system.md) |
+| **EventGraph** | 비주얼 이벤트/대화 그래프 시스템 | - |
 
 ## 빠른 시작
 
@@ -114,6 +115,7 @@ com.unity.mirror-rpg/
 │   ├── Combat/        # 전투 효과
 │   ├── Core/          # 데미지 시스템
 │   ├── Entity/        # 엔티티 인터페이스
+│   ├── EventGraph/    # 이벤트 그래프 시스템
 │   ├── Hitbox/        # 히트박스
 │   ├── Hurtbox/       # 허트박스
 │   ├── Skill/         # 스킬 시스템
@@ -133,6 +135,8 @@ com.unity.mirror-rpg/
 | `MirrorRPG.Combat` | 전투 효과 |
 | `MirrorRPG.Entity` | 엔티티 인터페이스 |
 | `MirrorRPG.StateMachine` | 상태 머신 |
+| `MirrorRPG.EventGraph` | 이벤트 그래프 코어 |
+| `MirrorRPG.EventGraph.Nodes` | 이벤트 노드 타입 |
 | `Combat` | 데미지 코어 |
 
 ## 주요 ScriptableObject
@@ -144,6 +148,7 @@ com.unity.mirror-rpg/
 | `BuffData` | MirrorRPG > Buff > Buff Data |
 | `SkillData` | MirrorRPG > Skill > Skill Data |
 | `CombatEffect` | MirrorRPG > Combat > Combat Effect |
+| `EventGraphAsset` | MirrorRPG > Event Graph |
 
 ## 라이센스
 
