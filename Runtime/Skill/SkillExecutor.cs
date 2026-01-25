@@ -23,6 +23,7 @@ namespace MirrorRPG.Skill
         private float previousTimer;
         private bool isExecuting;
         private SkillActionContext context;
+        private float skillDuration; // 외부에서 설정하거나 애니메이션 클립 길이에서 가져옴
 
         // Track active duration actions
         private List<DurationSkillAction> activeDurationActions = new List<DurationSkillAction>();
@@ -67,7 +68,7 @@ namespace MirrorRPG.Skill
             ProcessActions();
 
             // Check if skill ended
-            if (skillTimer >= currentSkill.Duration)
+            if (skillTimer >= skillDuration)
             {
                 EndSkill();
             }
@@ -81,6 +82,21 @@ namespace MirrorRPG.Skill
         /// <param name="direction">Optional direction</param>
         /// <returns>True if skill started successfully</returns>
         public bool ExecuteSkill(ISkillData skill, GameObject target = null, Vector3? direction = null)
+        {
+            // 애니메이션 클립 길이를 자동으로 가져옴
+            float? animDuration = GetAnimationClipDuration(skill?.AnimationTrigger);
+            return ExecuteSkillWithDuration(skill, animDuration ?? 1f, target, direction);
+        }
+
+        /// <summary>
+        /// Start executing a skill with explicit duration
+        /// </summary>
+        /// <param name="skill">Skill data to execute</param>
+        /// <param name="duration">Skill duration in seconds</param>
+        /// <param name="target">Optional target</param>
+        /// <param name="direction">Optional direction</param>
+        /// <returns>True if skill started successfully</returns>
+        public bool ExecuteSkillWithDuration(ISkillData skill, float duration, GameObject target = null, Vector3? direction = null)
         {
             if (skill == null)
             {
@@ -96,6 +112,7 @@ namespace MirrorRPG.Skill
 
             // Setup execution
             currentSkill = skill;
+            skillDuration = duration;
             skillTimer = 0f;
             previousTimer = 0f;
             isExecuting = true;
@@ -111,7 +128,7 @@ namespace MirrorRPG.Skill
                 Direction = direction ?? transform.forward
             };
 
-            if (debugMode) Debug.Log($"[SkillExecutor] Started skill: {skill.SkillName}");
+            if (debugMode) Debug.Log($"[SkillExecutor] Started skill: {skill.SkillName} (duration: {skillDuration:F2}s)");
 
             OnSkillStarted?.Invoke(skill);
 
@@ -119,6 +136,30 @@ namespace MirrorRPG.Skill
             ProcessActions();
 
             return true;
+        }
+
+        /// <summary>
+        /// Animator에서 애니메이션 클립 길이를 가져옴
+        /// </summary>
+        private float? GetAnimationClipDuration(string clipName)
+        {
+            if (string.IsNullOrEmpty(clipName))
+                return null;
+
+            var animator = GetComponent<Animator>();
+            if (animator == null || animator.runtimeAnimatorController == null)
+                return null;
+
+            foreach (var clip in animator.runtimeAnimatorController.animationClips)
+            {
+                if (clip.name == clipName)
+                {
+                    return clip.length;
+                }
+            }
+
+            if (debugMode) Debug.LogWarning($"[SkillExecutor] Animation clip '{clipName}' not found");
+            return null;
         }
 
         /// <summary>
