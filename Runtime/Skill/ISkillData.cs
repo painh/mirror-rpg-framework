@@ -15,10 +15,7 @@ namespace MirrorRPG.Skill
         /// </summary>
         string SkillName { get; }
 
-        /// <summary>
-        /// Total duration of the skill in seconds
-        /// </summary>
-        float Duration { get; }
+        // Duration 제거됨 - 애니메이션 클립 길이를 런타임에 Animator에서 직접 가져옴
 
         /// <summary>
         /// Base damage value
