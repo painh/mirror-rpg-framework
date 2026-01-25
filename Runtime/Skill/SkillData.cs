@@ -63,6 +63,14 @@ namespace MirrorRPG.Skill
         [Tooltip("슈퍼아머 (피격 경직 무시)")]
         public bool hasSuperArmor = false;
 
+        [Header("Aim Correction")]
+        [Tooltip("스킬 시작 시 마우스 방향으로 회전 보정")]
+        public bool enableAimCorrection = true;
+
+        [Tooltip("최대 회전 보정 각도 (현재 방향 기준, 0=무제한)")]
+        [Range(0f, 180f)]
+        public float maxAimCorrectionAngle = 90f;
+
         [Header("Resource Cost")]
         [Tooltip("마나/스태미나 소모량")]
         public float resourceCost = 0f;
